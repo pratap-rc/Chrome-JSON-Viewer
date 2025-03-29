@@ -32,7 +32,38 @@
   transform: translateY(-1px);
 }
 
-/* JSON Beautifier Syntax Highlighting */
+/* JSON Beautifier Tree Styles */
+.json-beautifier-item {
+  position: relative;
+}
+
+.json-beautifier-collapsible {
+  cursor: pointer;
+  user-select: none;
+  border-radius: 3px;
+  transition: background-color 0.15s ease;
+}
+
+.json-beautifier-collapsible:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.json-beautifier-toggle {
+  display: inline-block;
+  width: 15px;
+  text-align: center;
+  transition: transform 0.15s ease;
+}
+
+.json-beautifier-content {
+  margin-left: 20px;
+}
+
+.json-beautifier-property {
+  margin: 2px 0;
+}
+
+/* JSON syntax highlighting */
 .json-key { 
   color: #007bff; 
   font-weight: bold;
@@ -56,17 +87,31 @@
   font-style: italic;
 }
 
-/* We're using inline styles for most elements, but keeping this file for additional customization */
+.json-beautifier-count {
+  color: #6c757d;
+  font-size: 0.85em;
+  margin-left: 5px;
+}
+
+.json-index {
+  color: #6c757d;
+  font-size: 0.85em;
+}
+
+/* Container styles */
 #json-beautifier-container {
   font-family: monospace;
   background-color: #f8f9fa;
+  line-height: 1.5;
+  padding: 20px;
 }
 
 #json-beautifier-output {
+  font-family: monospace;
   line-height: 1.5;
 }
 
-/* Media query for dark mode - these styles will be applied if inline styles don't take precedence */
+/* Media query for dark mode */
 @media (prefers-color-scheme: dark) {
   #json-beautifier-container {
     background-color: #1e1e1e;
@@ -82,6 +127,10 @@
   .json-number { color: #b5cea8; }
   .json-boolean { color: #569cd6; }
   .json-null { color: #8f8f8f; }
+  
+  .json-beautifier-collapsible:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+  }
   
   #json-beautifier-download {
     background-color: #0e639c;
@@ -139,9 +188,10 @@
 }
 
 /* For very small screens, stack the buttons vertically */
-@media screen and (max-width: 400px) {
+@media screen and (max-width: 500px) {
   #json-beautifier-buttons {
     flex-direction: column;
     align-items: flex-end;
+    gap: 5px;
   }
 } 
