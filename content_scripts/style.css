@@ -35,6 +35,8 @@
 /* JSON Beautifier Tree Styles */
 .json-beautifier-item {
   position: relative;
+  display: inline-block;
+  vertical-align: top;
 }
 
 .json-beautifier-collapsible {
@@ -61,12 +63,28 @@
 
 .json-beautifier-property {
   margin: 2px 0;
+  align-items: flex-start; /* Default alignment for all properties */
+}
+
+/* Properties with flex display will have key and value on same line */
+.json-beautifier-property[style*="display: flex"] > .json-beautifier-item {
+  display: inline-flex;
+  margin-left: 0;
+  align-self: flex-start; /* Ensure alignment is at the top */
+}
+
+/* Key and index containers should align at the top */
+.json-key, 
+.json-index {
+  align-self: flex-start;
+  padding-top: 2px; /* Small padding to align with the first line of content */
 }
 
 /* JSON syntax highlighting */
 .json-key { 
   color: #007bff; 
   font-weight: bold;
+  white-space: nowrap;
 }
 
 .json-string { 
@@ -96,6 +114,7 @@
 .json-index {
   color: #6c757d;
   font-size: 0.85em;
+  white-space: nowrap;
 }
 
 /* Container styles */

@@ -195,9 +195,19 @@
     let index = 0;
     for (const key in obj) {
       if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        const value = obj[key];
+        const isSimpleValue = value === null || typeof value !== 'object';
+        
         const propertyContainer = document.createElement('div');
         propertyContainer.className = 'json-beautifier-property';
         propertyContainer.style.margin = '2px 0';
+        
+        // For simple values, use inline display (same line)
+        if (isSimpleValue) {
+          propertyContainer.style.display = 'flex';
+          propertyContainer.style.flexWrap = 'nowrap';
+          propertyContainer.style.alignItems = 'flex-start';
+        }
         
         if (isArray) {
           // For arrays, show the index
@@ -218,7 +228,7 @@
         }
         
         // Recursively create child content
-        const valueElement = createCollapsibleJSON(obj[key], false);
+        const valueElement = createCollapsibleJSON(value, false);
         propertyContainer.appendChild(valueElement);
         
         // Add comma if not the last item
