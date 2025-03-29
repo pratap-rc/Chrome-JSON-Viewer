@@ -49,12 +49,31 @@
     return;
   }
 
+  // Detect system color scheme preference (dark or light mode)
+  const prefersDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  
+  // Set colors based on system preference
+  const colors = {
+    background: prefersDarkMode ? '#1e1e1e' : '#f8f9fa',
+    text: prefersDarkMode ? '#e0e0e0' : '#333333',
+    keyColor: prefersDarkMode ? '#9cdcfe' : '#007bff',
+    stringColor: prefersDarkMode ? '#ce9178' : '#28a745',
+    numberColor: prefersDarkMode ? '#b5cea8' : '#fd7e14',
+    booleanColor: prefersDarkMode ? '#569cd6' : '#dc3545',
+    nullColor: prefersDarkMode ? '#8f8f8f' : '#6c757d',
+    buttonBg: prefersDarkMode ? '#0e639c' : '#007bff',
+    buttonHoverBg: prefersDarkMode ? '#1177bb' : '#0056b3',
+    toggleButtonBg: prefersDarkMode ? '#4d4d4d' : '#6c757d',
+    toggleButtonHoverBg: prefersDarkMode ? '#646464' : '#5a6268'
+  };
+
   // Create elements for the prettified display
   const container = document.createElement('div');
   container.id = 'json-beautifier-container';
   container.style.fontFamily = 'monospace';
   container.style.padding = '20px';
-  container.style.backgroundColor = '#f8f9fa';
+  container.style.backgroundColor = colors.background;
+  container.style.color = colors.text;
   container.style.position = 'relative';
   container.style.margin = '0';
   container.style.border = 'none';
@@ -64,12 +83,16 @@
 
   // Create button container for controls
   const buttonContainer = document.createElement('div');
+  buttonContainer.id = 'json-beautifier-buttons';
   buttonContainer.style.position = 'fixed';
   buttonContainer.style.top = '10px';
   buttonContainer.style.right = '10px';
   buttonContainer.style.zIndex = '9999';
   buttonContainer.style.display = 'flex';
+  buttonContainer.style.flexDirection = 'row';
   buttonContainer.style.gap = '10px';
+  buttonContainer.style.flexWrap = 'nowrap';
+  buttonContainer.style.alignItems = 'center';
 
   // Create download button
   const downloadButton = document.createElement('button');
@@ -78,13 +101,26 @@
   
   // Apply inline styles for the button
   downloadButton.style.padding = '8px 12px';
-  downloadButton.style.backgroundColor = '#007bff';
+  downloadButton.style.backgroundColor = colors.buttonBg;
   downloadButton.style.color = '#fff';
   downloadButton.style.border = 'none';
   downloadButton.style.borderRadius = '4px';
   downloadButton.style.fontWeight = 'bold';
   downloadButton.style.cursor = 'pointer';
-  downloadButton.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)';
+  downloadButton.style.boxShadow = prefersDarkMode ? '0 2px 5px rgba(0,0,0,0.5)' : '0 2px 5px rgba(0,0,0,0.2)';
+  downloadButton.style.transition = 'background-color 0.2s ease, transform 0.1s ease';
+  downloadButton.style.whiteSpace = 'nowrap';
+
+  // Add hover effect
+  downloadButton.addEventListener('mouseover', () => {
+    downloadButton.style.backgroundColor = colors.buttonHoverBg;
+    downloadButton.style.transform = 'translateY(-1px)';
+  });
+
+  downloadButton.addEventListener('mouseout', () => {
+    downloadButton.style.backgroundColor = colors.buttonBg;
+    downloadButton.style.transform = 'translateY(0)';
+  });
 
   // Create the display for beautified JSON
   const pre = document.createElement('pre');
@@ -96,24 +132,32 @@
   pre.style.whiteSpace = 'pre-wrap';
   pre.style.wordWrap = 'break-word';
   pre.style.lineHeight = '1.5';
+  pre.style.color = colors.text;
 
-  // Function to syntax highlight the JSON
+  // Function to syntax highlight the JSON with theme-appropriate colors
   function syntaxHighlight(json) {
     json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
       let cls = 'json-number';
+      let style = `color: ${colors.numberColor};`;
+      
       if (/^"/.test(match)) {
         if (/:$/.test(match)) {
           cls = 'json-key';
+          style = `color: ${colors.keyColor}; font-weight: bold;`;
         } else {
           cls = 'json-string';
+          style = `color: ${colors.stringColor};`;
         }
       } else if (/true|false/.test(match)) {
         cls = 'json-boolean';
+        style = `color: ${colors.booleanColor}; font-weight: bold;`;
       } else if (/null/.test(match)) {
         cls = 'json-null';
+        style = `color: ${colors.nullColor}; font-style: italic;`;
       }
-      return '<span class="' + cls + '">' + match + '</span>';
+      
+      return `<span class="${cls}" style="${style}">${match}</span>`;
     });
   }
 
@@ -174,13 +218,26 @@
   toggleButton.id = 'json-beautifier-toggle';
   toggleButton.textContent = 'View Raw JSON';
   toggleButton.style.padding = '8px 12px';
-  toggleButton.style.backgroundColor = '#6c757d';
+  toggleButton.style.backgroundColor = colors.toggleButtonBg;
   toggleButton.style.color = '#fff';
   toggleButton.style.border = 'none';
   toggleButton.style.borderRadius = '4px';
   toggleButton.style.fontWeight = 'bold';
   toggleButton.style.cursor = 'pointer';
-  toggleButton.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)';
+  toggleButton.style.boxShadow = prefersDarkMode ? '0 2px 5px rgba(0,0,0,0.5)' : '0 2px 5px rgba(0,0,0,0.2)';
+  toggleButton.style.transition = 'background-color 0.2s ease, transform 0.1s ease';
+  toggleButton.style.whiteSpace = 'nowrap';
+
+  // Add hover effect for toggle button
+  toggleButton.addEventListener('mouseover', () => {
+    toggleButton.style.backgroundColor = colors.toggleButtonHoverBg;
+    toggleButton.style.transform = 'translateY(-1px)';
+  });
+
+  toggleButton.addEventListener('mouseout', () => {
+    toggleButton.style.backgroundColor = colors.toggleButtonBg;
+    toggleButton.style.transform = 'translateY(0)';
+  });
 
   // Store original page content for toggling
   const originalContent = document.body.innerHTML;
@@ -207,16 +264,14 @@
     }
   });
 
-  // Add inline styles for syntax highlighting
-  const style = document.createElement('style');
-  style.textContent = `
-    .json-key { color: #007bff; font-weight: bold; }
-    .json-string { color: #28a745; }
-    .json-number { color: #fd7e14; }
-    .json-boolean { color: #dc3545; font-weight: bold; }
-    .json-null { color: #6c757d; font-style: italic; }
-  `;
-  document.head.appendChild(style);
+  // Add theme change listener to adapt colors when system theme changes
+  if (window.matchMedia) {
+    const colorSchemeQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    colorSchemeQuery.addEventListener('change', () => {
+      // Refresh the page to apply new theme
+      window.location.reload();
+    });
+  }
 
   // Add buttons to the button container
   buttonContainer.appendChild(downloadButton);

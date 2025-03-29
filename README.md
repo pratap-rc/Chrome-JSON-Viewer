@@ -6,6 +6,7 @@ This extension automatically detects and beautifies JSON content displayed in yo
 
 *   **Automatic JSON Detection:** Detects JSON content within `<pre>` tags or when the page body primarily contains JSON text.
 *   **Beautification:** Formats the detected JSON with standard indentation (2 spaces) and syntax highlighting.
+*   **System Theme Support:** Automatically adapts to your system's light/dark mode preference.
 *   **Clean Display:** Replaces the original page content with a clean, styled view of the beautified JSON.
 *   **Toggle View:** Switch between the beautified view and the original raw JSON view.
 *   **Download:** Add a button to download the beautified JSON content as a `.json` file.
@@ -26,8 +27,9 @@ Since this extension is not yet published on the Chrome Web Store, you need to l
 
 1.  Navigate to a web page that displays raw JSON data (e.g., an API endpoint response).
 2.  If the extension successfully detects valid JSON, the page content will be automatically replaced with the syntax-highlighted beautified version.
-3.  Use the "View Raw JSON" button to toggle back to the original unformatted view.
-4.  Click the "Download JSON" button to download the beautified content as a `beautified.json` file.
+3.  The extension automatically adapts to your system's light or dark mode preference.
+4.  Use the "View Raw JSON" button to toggle back to the original unformatted view.
+5.  Click the "Download JSON" button to download the beautified content as a `beautified.json` file.
 
 ## Files
 

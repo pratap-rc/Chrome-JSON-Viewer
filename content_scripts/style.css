@@ -1,33 +1,35 @@
 /* Remove previous body, container, and output styles */
 
-#json-beautifier-download {
-  /* Use fixed positioning */
+/* Button container styling */
+#json-beautifier-buttons {
   position: fixed;
-  top: 15px;
-  right: 15px;
-  z-index: 9999; /* High z-index to stay on top */
+  top: 10px;
+  right: 10px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  flex-wrap: nowrap;
+  align-items: center;
+}
 
-  /* Button styling */
+/* Button common styles */
+#json-beautifier-download,
+#json-beautifier-toggle {
   padding: 8px 12px;
   font-size: 13px;
   font-weight: bold;
   color: #fff;
-  background-color: #007bff;
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+  white-space: nowrap;
+  transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
 }
 
-#json-beautifier-download:hover {
-  background-color: #0056b3;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-}
-
-#json-beautifier-download:active {
-  background-color: #004085;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+#json-beautifier-download:hover, 
+#json-beautifier-toggle:hover {
+  transform: translateY(-1px);
 }
 
 /* JSON Beautifier Syntax Highlighting */
@@ -64,6 +66,82 @@
   line-height: 1.5;
 }
 
-#json-beautifier-toggle:hover {
-  transform: translateY(-1px);
+/* Media query for dark mode - these styles will be applied if inline styles don't take precedence */
+@media (prefers-color-scheme: dark) {
+  #json-beautifier-container {
+    background-color: #1e1e1e;
+    color: #e0e0e0;
+  }
+  
+  #json-beautifier-output {
+    color: #e0e0e0;
+  }
+  
+  .json-key { color: #9cdcfe; }
+  .json-string { color: #ce9178; }
+  .json-number { color: #b5cea8; }
+  .json-boolean { color: #569cd6; }
+  .json-null { color: #8f8f8f; }
+  
+  #json-beautifier-download {
+    background-color: #0e639c;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+  }
+  
+  #json-beautifier-download:hover {
+    background-color: #1177bb;
+  }
+  
+  #json-beautifier-toggle {
+    background-color: #4d4d4d;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+  }
+  
+  #json-beautifier-toggle:hover {
+    background-color: #646464;
+  }
+}
+
+/* Media query for light mode */
+@media (prefers-color-scheme: light) {
+  #json-beautifier-container {
+    background-color: #f8f9fa;
+    color: #333333;
+  }
+  
+  #json-beautifier-output {
+    color: #333333;
+  }
+  
+  .json-key { color: #007bff; }
+  .json-string { color: #28a745; }
+  .json-number { color: #fd7e14; }
+  .json-boolean { color: #dc3545; }
+  .json-null { color: #6c757d; }
+  
+  #json-beautifier-download {
+    background-color: #007bff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  }
+  
+  #json-beautifier-download:hover {
+    background-color: #0056b3;
+  }
+  
+  #json-beautifier-toggle {
+    background-color: #6c757d;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  }
+  
+  #json-beautifier-toggle:hover {
+    background-color: #5a6268;
+  }
+}
+
+/* For very small screens, stack the buttons vertically */
+@media screen and (max-width: 400px) {
+  #json-beautifier-buttons {
+    flex-direction: column;
+    align-items: flex-end;
+  }
 } 
