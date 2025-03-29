@@ -1,13 +1,13 @@
 # JSON Beautifier Chrome Extension
 
-This extension automatically detects and beautifies JSON content displayed in your browser tabs. It replaces the raw JSON view with a formatted, readable version with syntax highlighting and provides a button to download the beautified JSON.
+This extension automatically detects and beautifies JSON content displayed in your browser tabs. It transforms raw JSON into a collapsible tree view with syntax highlighting, making JSON data easier to read and navigate.
 
 ## Features
 
 *   **Automatic JSON Detection:** Detects JSON content within `<pre>` tags or when the page body primarily contains JSON text.
-*   **Beautification:** Formats the detected JSON with standard indentation (2 spaces) and syntax highlighting.
+*   **Interactive Tree View:** Displays JSON objects and arrays as a collapsible tree structure with expandable/collapsible arrows.
+*   **Syntax Highlighting:** Color-codes different JSON elements (keys, strings, numbers, etc.) for better readability.
 *   **System Theme Support:** Automatically adapts to your system's light/dark mode preference.
-*   **Clean Display:** Replaces the original page content with a clean, styled view of the beautified JSON.
 *   **Toggle View:** Switch between the beautified view and the original raw JSON view.
 *   **Download:** Add a button to download the beautified JSON content as a `.json` file.
 
@@ -26,15 +26,16 @@ Since this extension is not yet published on the Chrome Web Store, you need to l
 ## How to Use
 
 1.  Navigate to a web page that displays raw JSON data (e.g., an API endpoint response).
-2.  If the extension successfully detects valid JSON, the page content will be automatically replaced with the syntax-highlighted beautified version.
-3.  The extension automatically adapts to your system's light or dark mode preference.
-4.  Use the "View Raw JSON" button to toggle back to the original unformatted view.
-5.  Click the "Download JSON" button to download the beautified content as a `beautified.json` file.
+2.  If the extension successfully detects valid JSON, the page content will be automatically replaced with an interactive tree view of the JSON with syntax highlighting.
+3.  Click on the arrow (▼) buttons next to objects and arrays to collapse or expand those sections.
+4.  The extension automatically adapts to your system's light or dark mode preference.
+5.  Use the "View Raw JSON" button to toggle back to the original unformatted view.
+6.  Click the "Download JSON" button to download the beautified content as a `beautified.json` file.
 
 ## Files
 
 *   `manifest.json`: Defines the extension's configuration, permissions, and scripts.
 *   `content_scripts/content.js`: The script injected into web pages to detect, beautify, and display JSON.
-*   `content_scripts/style.css`: Styles applied to the beautified JSON output and buttons.
+*   `content_scripts/style.css`: Styles applied to the beautified JSON tree view and buttons.
 *   `background.js`: The service worker that handles the download functionality.
 *   `icons/`: Contains placeholder icons for the extension (icon16.png, icon48.png, icon128.png). **Remember to replace these with actual icon images.** 

@@ -64,7 +64,8 @@
     buttonBg: prefersDarkMode ? '#0e639c' : '#007bff',
     buttonHoverBg: prefersDarkMode ? '#1177bb' : '#0056b3',
     toggleButtonBg: prefersDarkMode ? '#4d4d4d' : '#6c757d',
-    toggleButtonHoverBg: prefersDarkMode ? '#646464' : '#5a6268'
+    toggleButtonHoverBg: prefersDarkMode ? '#646464' : '#5a6268',
+    arrowColor: prefersDarkMode ? '#9cdcfe' : '#007bff'
   };
 
   // Create elements for the prettified display
@@ -122,47 +123,175 @@
     downloadButton.style.transform = 'translateY(0)';
   });
 
-  // Create the display for beautified JSON
-  const pre = document.createElement('pre');
-  pre.id = 'json-beautifier-output';
-  pre.style.margin = '0';
-  pre.style.padding = '0';
-  pre.style.backgroundColor = 'transparent';
-  pre.style.overflow = 'auto';
-  pre.style.whiteSpace = 'pre-wrap';
-  pre.style.wordWrap = 'break-word';
-  pre.style.lineHeight = '1.5';
-  pre.style.color = colors.text;
-
-  // Function to syntax highlight the JSON with theme-appropriate colors
-  function syntaxHighlight(json) {
-    json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
-      let cls = 'json-number';
-      let style = `color: ${colors.numberColor};`;
+  // Function to create a collapsible JSON tree
+  function createCollapsibleJSON(obj, isRoot = true) {
+    const container = document.createElement('div');
+    container.className = 'json-beautifier-item';
+    
+    if (obj === null) {
+      container.innerHTML = `<span class="json-null" style="color: ${colors.nullColor}; font-style: italic;">null</span>`;
+      return container;
+    }
+    
+    if (typeof obj !== 'object') {
+      let value = obj;
+      let className = 'json-string';
+      let style = `color: ${colors.stringColor};`;
       
-      if (/^"/.test(match)) {
-        if (/:$/.test(match)) {
-          cls = 'json-key';
-          style = `color: ${colors.keyColor}; font-weight: bold;`;
-        } else {
-          cls = 'json-string';
-          style = `color: ${colors.stringColor};`;
-        }
-      } else if (/true|false/.test(match)) {
-        cls = 'json-boolean';
+      if (typeof obj === 'number') {
+        className = 'json-number';
+        style = `color: ${colors.numberColor};`;
+      } else if (typeof obj === 'boolean') {
+        className = 'json-boolean';
         style = `color: ${colors.booleanColor}; font-weight: bold;`;
-      } else if (/null/.test(match)) {
-        cls = 'json-null';
-        style = `color: ${colors.nullColor}; font-style: italic;`;
+        value = obj ? 'true' : 'false';
+      } else {
+        // It's a string, escape it
+        value = `"${obj.toString().replace(/"/g, '\\"').replace(/</g, '&lt;').replace(/>/g, '&gt;')}"`;
       }
       
-      return `<span class="${cls}" style="${style}">${match}</span>`;
+      container.innerHTML = `<span class="${className}" style="${style}">${value}</span>`;
+      return container;
+    }
+    
+    const isArray = Array.isArray(obj);
+    const bracketOpen = isArray ? '[' : '{';
+    const bracketClose = isArray ? ']' : '}';
+    const itemsCount = Object.keys(obj).length;
+    
+    // Create the collapsible header
+    const header = document.createElement('div');
+    header.className = 'json-beautifier-collapsible';
+    header.style.cursor = 'pointer';
+    header.style.userSelect = 'none';
+    header.style.borderRadius = '3px';
+    
+    // Create the arrow toggle
+    const toggle = document.createElement('span');
+    toggle.className = 'json-beautifier-toggle';
+    toggle.innerHTML = '&#9660;'; // Down arrow
+    toggle.style.display = 'inline-block';
+    toggle.style.width = '15px';
+    toggle.style.textAlign = 'center';
+    toggle.style.color = colors.arrowColor;
+    toggle.style.transform = 'rotate(0deg)';
+    toggle.style.transition = 'transform 0.15s ease';
+    
+    // Create header content with type and count
+    const headerContent = document.createElement('span');
+    const countText = itemsCount > 0 ? ` <span class="json-beautifier-count" style="color: ${prefersDarkMode ? '#8f8f8f' : '#6c757d'}; font-size: 0.85em;">(${itemsCount} item${itemsCount !== 1 ? 's' : ''})</span>` : '';
+    headerContent.innerHTML = `${bracketOpen}${countText}`;
+    
+    header.appendChild(toggle);
+    header.appendChild(headerContent);
+    container.appendChild(header);
+    
+    // Create content container for child elements
+    const content = document.createElement('div');
+    content.className = 'json-beautifier-content';
+    content.style.marginLeft = '20px';
+    content.style.display = 'block'; // Start expanded
+    
+    let index = 0;
+    for (const key in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        const value = obj[key];
+        const isSimpleValue = value === null || typeof value !== 'object';
+        
+        const propertyContainer = document.createElement('div');
+        propertyContainer.className = 'json-beautifier-property';
+        propertyContainer.style.margin = '2px 0';
+        
+        // For simple values, use inline display (same line)
+        if (isSimpleValue) {
+          propertyContainer.style.display = 'flex';
+          propertyContainer.style.flexWrap = 'nowrap';
+          propertyContainer.style.alignItems = 'flex-start';
+        }
+        
+        if (isArray) {
+          // For arrays, show the index
+          const indexSpan = document.createElement('span');
+          indexSpan.className = 'json-index';
+          indexSpan.style.color = prefersDarkMode ? '#8f8f8f' : '#6c757d';
+          indexSpan.style.fontSize = '0.85em';
+          indexSpan.textContent = `${index}: `;
+          propertyContainer.appendChild(indexSpan);
+        } else {
+          // For objects, show the key
+          const keySpan = document.createElement('span');
+          keySpan.className = 'json-key';
+          keySpan.style.color = colors.keyColor;
+          keySpan.style.fontWeight = 'bold';
+          keySpan.textContent = `"${key}": `;
+          propertyContainer.appendChild(keySpan);
+        }
+        
+        // Recursively create child content
+        const valueElement = createCollapsibleJSON(value, false);
+        propertyContainer.appendChild(valueElement);
+        
+        // Add comma if not the last item
+        if (index < itemsCount - 1) {
+          const commaSpan = document.createElement('span');
+          commaSpan.textContent = ',';
+          propertyContainer.appendChild(commaSpan);
+        }
+        
+        content.appendChild(propertyContainer);
+        index++;
+      }
+    }
+    
+    // Add closing bracket
+    const closingElement = document.createElement('span');
+    closingElement.textContent = bracketClose;
+    container.appendChild(content);
+    container.appendChild(closingElement);
+    
+    // Add toggle functionality
+    header.addEventListener('click', (e) => {
+      e.stopPropagation(); // Prevent event bubbling
+      
+      if (content.style.display === 'none') {
+        // Expand
+        content.style.display = 'block';
+        toggle.style.transform = 'rotate(0deg)';
+        toggle.innerHTML = '&#9660;'; // Down arrow
+      } else {
+        // Collapse
+        content.style.display = 'none';
+        toggle.style.transform = 'rotate(-90deg)';
+        toggle.innerHTML = '&#9660;'; // Down arrow (will appear as right arrow when rotated)
+      }
     });
+    
+    // Add hover effect to collapsible header
+    header.addEventListener('mouseover', () => {
+      header.style.backgroundColor = prefersDarkMode ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)';
+    });
+    
+    header.addEventListener('mouseout', () => {
+      header.style.backgroundColor = 'transparent';
+    });
+    
+    return container;
   }
 
-  // Apply syntax highlighting
-  pre.innerHTML = syntaxHighlight(beautifiedJson);
+  // Create output container
+  const outputElement = document.createElement('div');
+  outputElement.id = 'json-beautifier-output';
+  outputElement.style.margin = '0';
+  outputElement.style.padding = '0';
+  outputElement.style.backgroundColor = 'transparent';
+  outputElement.style.overflow = 'auto';
+  outputElement.style.wordWrap = 'break-word';
+  outputElement.style.lineHeight = '1.5';
+  outputElement.style.color = colors.text;
+
+  // Create the collapsible JSON tree
+  const jsonTree = createCollapsibleJSON(jsonData);
+  outputElement.appendChild(jsonTree);
 
   // Add download functionality to button
   downloadButton.addEventListener('click', (event) => {
@@ -257,7 +386,7 @@
       // Switch to beautified view
       document.body.innerHTML = '';
       document.body.appendChild(container);
-      container.appendChild(pre);
+      container.appendChild(outputElement);
       document.body.appendChild(buttonContainer);
       toggleButton.textContent = 'View Raw JSON';
       isBeautified = true;
@@ -279,7 +408,7 @@
 
   // Clear existing content and add our beautified display
   document.body.innerHTML = '';
-  container.appendChild(pre);
+  container.appendChild(outputElement);
   document.body.appendChild(container);
   document.body.appendChild(buttonContainer);
 })(); 
