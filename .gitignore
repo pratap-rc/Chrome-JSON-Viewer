@@ -1,0 +1,23 @@
+# Chrome extension related
+*.pem
+*.crx
+*.zip
+
+# IDE and editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS related files
+.DS_Store
+Thumbs.db
+
+# Node modules (if you use any build tooling)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Distribution folder
+dist/ 
