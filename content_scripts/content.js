@@ -4,24 +4,68 @@
   let beautifiedJson;
   let sourceText = '';
 
-  // First try to find pre-formatted JSON (common in browsers' JSON viewers)
-  const preElement = document.body.querySelector('pre');
-  if (preElement && preElement.textContent) {
-    sourceText = preElement.textContent.trim();
-  } else {
-    // If no pre element with content, check if the entire body contains JSON
-    // This could be the case for direct API responses
-    sourceText = document.body.textContent.trim();
+  // Function to check if the page contains only JSON and no other significant content
+  function isPageOnlyJSON() {
+    // First, check if there's a pre element with JSON
+    const preElement = document.body.querySelector('pre');
+    if (preElement && preElement.textContent.trim()) {
+      // If the pre element contains the majority of the page content, it's likely just JSON
+      const preContent = preElement.textContent.trim();
+      const bodyContent = document.body.textContent.trim();
+      
+      // Calculate the ratio of pre content to body content
+      // This helps determine if the pre content is the main content of the page
+      const contentRatio = preContent.length / bodyContent.length;
+      
+      // If the pre content is more than 90% of the body content, consider it JSON-only page
+      if (contentRatio > 0.9) {
+        sourceText = preContent;
+        return true;
+      }
+    }
+    
+    // If no pre element or pre element doesn't contain the majority of content,
+    // check if the body itself contains only JSON
+    const bodyText = document.body.textContent.trim();
+    
+    // Count the number of HTML elements with visible content
+    const contentElements = document.body.querySelectorAll('div, p, h1, h2, h3, h4, h5, h6, table, ul, ol, section, article, aside, nav, header, footer');
+    const hasMultipleContentElements = contentElements.length > 3; // Allow a few elements which might be part of simple API responses
+    
+    // Check if page has minimal HTML structure (raw content or API response)
+    const htmlContent = document.body.innerHTML.trim();
+    const hasMinimalHTML = htmlContent.length / bodyText.length < 1.5; // Ratio of HTML to text content should be small for raw JSON
+    
+    // If the page has complex structure, it's not just JSON
+    if (hasMultipleContentElements && !hasMinimalHTML) {
+      return false;
+    }
+    
+    // Check if the body text looks like JSON (starts/ends with {} or [])
+    if (!((bodyText.startsWith('{') && bodyText.endsWith('}')) || 
+          (bodyText.startsWith('[') && bodyText.endsWith(']')))) {
+      return false;
+    }
+    
+    // Try parsing the body content as JSON
+    try {
+      JSON.parse(bodyText);
+      sourceText = bodyText;
+      return true;
+    } catch (e) {
+      // Not valid JSON
+      return false;
+    }
+  }
+
+  // Only continue if the page contains just JSON
+  if (!isPageOnlyJSON()) {
+    console.debug("JSON Beautifier: Page doesn't contain only JSON or has other significant content");
+    return;
   }
 
   // Don't process if no text found
   if (!sourceText) {
-    return;
-  }
-
-  // Check if the text looks like JSON (starts/ends with {} or [])
-  if (!((sourceText.startsWith('{') && sourceText.endsWith('}')) || 
-        (sourceText.startsWith('[') && sourceText.endsWith(']')))) {
     return;
   }
 
